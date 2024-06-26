@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "952004332690",
+    "project_id": "code-ai-88d04",
+    "storage_bucket": "code-ai-88d04.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:952004332690:android:f398e182f5514a8351aa4b",
+        "android_client_info": {
+          "package_name": "com.example.bhc_prop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUqdJloyPUi8Qc3CKzTVfICHte-HZ6Bvc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
