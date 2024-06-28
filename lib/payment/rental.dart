@@ -1,8 +1,37 @@
-import 'package:bhc_prop/core/colors.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:bhc_prop/core/colors.dart';
 
-class RentalPaymentPage extends StatelessWidget {
+class RentalPaymentPage extends StatefulWidget {
+  @override
+  _RentalPaymentPageState createState() => _RentalPaymentPageState();
+}
+
+class _RentalPaymentPageState extends State<RentalPaymentPage> {
+  String userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getUsername();
+  }
+
+  Future<void> _getUsername() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String name = user.displayName ?? '';
+      String email = user.email ?? '';
+      String username = name.isNotEmpty ? name : email.split('@')[0];
+
+      setState(() {
+        userName = username;
+      });
+    } else {
+      setState(() {
+        userName = 'User';
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,38 +67,37 @@ class RentalPaymentPage extends StatelessWidget {
 
   Widget _buildUserInfoCard() {
     return Container(
-  width: double.infinity, // Ensure the card fills the available width
-  margin: EdgeInsets.symmetric(horizontal: 16), // Optional: Add horizontal margin for spacing
-  child: Card(
-    elevation: 4,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Name: Lefika Rapula',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(horizontal: 16),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Name: $userName',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Plot Number: 18795',
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Location: BHC Extension 7',
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
           ),
-          SizedBox(height: 8),
-          Text(
-            'Plot Number: 18795',
-            style: TextStyle(fontSize: 16),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Location: BHC Extension 7',
-            style: TextStyle(fontSize: 16),
-          ),
-        ],
+        ),
       ),
-    ),
-  ),
-);
-
+    );
   }
 
   Widget _buildCreditCardDetailsCard() {
@@ -124,7 +152,7 @@ class RentalPaymentPage extends StatelessWidget {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         Text(
-          '3400', // Assuming this is the rent amount
+          '3400',
           style: TextStyle(fontSize: 18),
         ),
       ],
@@ -136,73 +164,72 @@ class RentalPaymentPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ElevatedButton(
-            onPressed: () {
-              _showPaymentDialog(context, 'Pay for 1 months');
-            },
-            child: Text(
-              'Pay for 1 months',
-              style: TextStyle(
-                color: Colors.white, 
-                fontSize: 18, 
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color.fromARGB(255, 7, 196, 117), // Change color for emphasis
-              padding: EdgeInsets.symmetric(vertical: 15),
+          onPressed: () {
+            _showPaymentDialog(context, 'Pay for 1 month');
+          },
+          child: Text(
+            'Pay for 1 month',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
             ),
           ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color.fromARGB(255, 7, 196, 117),
+            padding: EdgeInsets.symmetric(vertical: 15),
+          ),
+        ),
         SizedBox(height: 12),
         ElevatedButton(
-            onPressed: () {
-              _showPaymentDialog(context, 'Pay for 3 months');
-            },
-            child: Text(
-              'Pay for 3 months',
-              style: TextStyle(
-                color: Colors.white, 
-                fontSize: 18, 
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color.fromARGB(255, 0, 0, 0), // Change color for emphasis
-              padding: EdgeInsets.symmetric(vertical: 15),
+          onPressed: () {
+            _showPaymentDialog(context, 'Pay for 3 months');
+          },
+          child: Text(
+            'Pay for 3 months',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
             ),
           ),
-
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color.fromARGB(255, 0, 0, 0),
+            padding: EdgeInsets.symmetric(vertical: 15),
+          ),
+        ),
         SizedBox(height: 12),
         ElevatedButton(
-            onPressed: () {
-              _showPaymentDialog(context, 'Pay for 6 months');
-            },
-            child: Text(
-              'Pay for 6 months',
-              style: TextStyle(
-                color: Colors.white, 
-                fontSize: 18, 
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color.fromARGB(255, 0, 0, 0), // Change color for emphasis
-              padding: EdgeInsets.symmetric(vertical: 15),
+          onPressed: () {
+            _showPaymentDialog(context, 'Pay for 6 months');
+          },
+          child: Text(
+            'Pay for 6 months',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
             ),
           ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color.fromARGB(255, 0, 0, 0),
+            padding: EdgeInsets.symmetric(vertical: 15),
+          ),
+        ),
         SizedBox(height: 12),
         ElevatedButton(
-            onPressed: () {
-              _showPaymentDialog(context, 'Pay for 12 months');
-            },
-            child: Text(
-              'Pay for 12 months',
-              style: TextStyle(
-                color: Colors.white, 
-                fontSize: 18, 
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color.fromARGB(255, 0, 0, 0), // Change color for emphasis
-              padding: EdgeInsets.symmetric(vertical: 15),
+          onPressed: () {
+            _showPaymentDialog(context, 'Pay for 12 months');
+          },
+          child: Text(
+            'Pay for 12 months',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
             ),
           ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color.fromARGB(255, 0, 0, 0),
+            padding: EdgeInsets.symmetric(vertical: 15),
+          ),
+        ),
       ],
     );
   }
@@ -228,7 +255,6 @@ class RentalPaymentPage extends StatelessWidget {
   }
 
   void _showHistoryDialog(BuildContext context) {
-    // Fake data for previous rent payments
     List<String> historyItems = [
       'Paid rent of 3400 on 2023-01-01',
       'Paid rent of 3400 on 2023-02-01',

@@ -1,6 +1,9 @@
 import 'package:bhc_prop/data/morgate.dart';
 import 'package:bhc_prop/pages/Guestpage/home/homepage.dart';
+import 'package:bhc_prop/pages/Login&Register/login.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 
 class HomePageBuyer extends StatefulWidget {
@@ -9,6 +12,26 @@ class HomePageBuyer extends StatefulWidget {
 }
 
 class _HomePageBuyerState extends State<HomePageBuyer> {
+  // Define the _getUsername method within this class
+  Future<String> _getUsername() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      String email = user.email ?? '';
+      String username = email.split('@')[0]; // Extract username
+      return username;
+    }
+
+    return 'User'; // Default username if not logged in
+  }
+
+  // Define the _logout method
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => LoginPage())); 
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,13 +39,17 @@ class _HomePageBuyerState extends State<HomePageBuyer> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.menu,
-            color: Colors.black87,
-          ),
-          onPressed: () {
-            Scaffold.of(context).openDrawer();
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: Icon(
+                Icons.menu,
+                color: Colors.black87,
+              ),
+              onPressed: () {
+                Scaffold.of(context).openDrawer(); // This opens the drawer
+              },
+            );
           },
         ),
         systemOverlayStyle: SystemUiOverlayStyle.dark,
@@ -109,6 +136,15 @@ class _HomePageBuyerState extends State<HomePageBuyer> {
                 Navigator.pop(context); // Close the drawer
               },
             ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                _logout(); // Call the logout function
+              },
+            ),
           ],
         ),
       ),
@@ -121,8 +157,7 @@ class _HomePageBuyerState extends State<HomePageBuyer> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius:
-                      BorderRadius.vertical(bottom: Radius.circular(30)),
+                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
                 ),
                 padding: EdgeInsets.all(20.0),
                 child: Column(
@@ -135,13 +170,31 @@ class _HomePageBuyerState extends State<HomePageBuyer> {
                     SizedBox(
                       height: 5,
                     ),
-                    Text(
-                      'Lefika',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    FutureBuilder<String>(
+                      future: _getUsername(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text(
+                            'Error loading username',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        } else {
+                          return Text(
+                            snapshot.data ?? 'User',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        }
+                      },
                     ),
                     SizedBox(
                       height: 20,
@@ -210,7 +263,7 @@ class _HomePageBuyerState extends State<HomePageBuyer> {
                           ),
                           promoCard(
                             'assets/images/two.jpg',
-                            'Morgate Calculator',
+                            'Mortgage Calculator',
                             () {
                               Navigator.push(
                                 context,
@@ -260,10 +313,10 @@ class _HomePageBuyerState extends State<HomePageBuyer> {
                               ],
                             ),
                           ),
-                          child: Align(
+                          child: const Align(
                             alignment: Alignment.bottomLeft,
                             child: Padding(
-                              padding: const EdgeInsets.all(15.0),
+                              padding: EdgeInsets.all(15.0),
                               child: Text(
                                 'View Available Properties',
                                 style: TextStyle(
@@ -293,7 +346,8 @@ class _HomePageBuyerState extends State<HomePageBuyer> {
         return AlertDialog(
           title: Text('Notification'),
           content: Text(
-            'Please check your cart. The property you applied for is in the cart tab. View to complete the purchase.',
+            'Please check your cart. The property you applied for is in the cart tab. View your cart to proceed.',
+            style: TextStyle(fontSize: 16, color: Colors.black),
           ),
           actions: <Widget>[
             TextButton(
@@ -308,46 +362,29 @@ class _HomePageBuyerState extends State<HomePageBuyer> {
     );
   }
 
-  Widget promoCard(String image, String text, VoidCallback onTap) {
+  Widget promoCard(String imagePath, String text, VoidCallback onTap) {
     return AspectRatio(
       aspectRatio: 2.62 / 3,
       child: InkWell(
         onTap: onTap,
         child: Container(
-          margin: EdgeInsets.only(right: 15.0),
+          margin: EdgeInsets.only(right: 15),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             image: DecorationImage(
               fit: BoxFit.cover,
-              image: AssetImage(image),
+              image: AssetImage(imagePath),
             ),
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: LinearGradient(
-                begin: Alignment.bottomRight,
-                stops: [
-                  0.1,
-                  0.9,
-                ],
-                colors: [
-                  Colors.black.withOpacity(.8),
-                  Colors.black.withOpacity(.1),
-                ],
-              ),
-            ),
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  text,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: Padding(
+              padding: EdgeInsets.all(15),
+              child: Text(
+                text,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -562,6 +599,3 @@ class PaymentsPage extends StatelessWidget {
     );
   }
 }
-
-
-

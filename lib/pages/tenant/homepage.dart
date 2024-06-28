@@ -1,11 +1,15 @@
 import 'package:bhc_prop/call_reporting/request.dart';
 import 'package:bhc_prop/core/colors.dart';
+import 'package:bhc_prop/pages/Login&Register/login.dart';
 import 'package:bhc_prop/pages/tenant/widgets(tenant)/widgets.dart';
 import 'package:bhc_prop/payment/rental.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,14 +22,50 @@ class MyApp extends StatelessWidget {
       routes: {
       '/maintenanceRequest': (context) => RequestPage(),
       '/payrent': (context) =>  RentalPaymentPage(),
+      '/login': (context) =>  const LoginPage(),
+
       
       // Add more routes as needed
     },
     );
   }
 }
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
 
-class MyHomePage extends StatelessWidget {
+class _MyHomePageState extends State<MyHomePage> {
+  String userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getUsername();
+  }
+
+  Future<void> _getUsername() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String name = user.displayName ?? '';
+      String email = user.email ?? '';
+      String username = name.isNotEmpty ? name : email.split('@')[0];
+
+      setState(() {
+        userName = username;
+      });
+    } else {
+      setState(() {
+        userName = 'User';
+      });
+    }
+  }
+
+  Future<void> _signOut() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacementNamed(context, '/login'); // Replace '/login' with your login route
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -50,7 +90,7 @@ class MyHomePage extends StatelessWidget {
                 leading: Icon(Icons.payment),
                 title: Text('Payments'),
                 onTap: () {
-                  // Navigate to Payments page
+                  Navigator.pushNamed(context, '/payrent');
                 },
               ),
               ListTile(
@@ -64,14 +104,22 @@ class MyHomePage extends StatelessWidget {
                 leading: Icon(Icons.build),
                 title: Text('Maintenance Requests'),
                 onTap: () {
-                  // Navigate to Maintenance Requests page
+                  Navigator.pushNamed(context, '/maintenanceRequest');
                 },
               ),
               ListTile(
                 leading: Icon(Icons.chat),
                 title: Text('Group Chat'),
                 onTap: () {
-                  // Navigate to Group Chat page
+                  // Handle Group Chat navigation
+                },
+              ),
+              Divider(),
+              ListTile(
+                leading: Icon(Icons.logout),
+                title: Text('Logout'),
+                onTap: () async {
+                  await _signOut();
                 },
               ),
             ],
@@ -79,7 +127,6 @@ class MyHomePage extends StatelessWidget {
         ),
         body: Container(
           decoration: BoxDecoration(
-            
             image: DecorationImage(
               image: AssetImage("assets/images/back.png"),
               fit: BoxFit.cover,
@@ -92,19 +139,22 @@ class MyHomePage extends StatelessWidget {
                 child: Row(
                   children: [
                     Builder(
-                      builder: (context) {
-                        return IconButton(
-                          icon: Icon(Icons.menu, size: 30),
-                          onPressed: () {
-                            Scaffold.of(context).openDrawer();
-                          },
-                        );
-                      },
-                    ),
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: Icon(
+                Icons.menu,
+                color: Colors.black87,
+              ),
+              onPressed: () {
+                Scaffold.of(context).openDrawer(); // This opens the drawer
+              },
+            );
+          },
+        ),
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        "Good Morning\nLefika",
+                        "Good Morning\n$userName",
                         style: TextStyle(
                           fontFamily: "Josefin",
                           fontSize: 28,
@@ -148,9 +198,9 @@ class MyHomePage extends StatelessWidget {
                               modeName: "Payments",
                               assetImage: "assets/images/pay.png",
                               buttonAsset: "assets/images/nav.png",
-                               onTap: () {
+                              onTap: () {
                                 Navigator.pushNamed(context, '/payrent');
-                              }, 
+                              },
                             ),
                             Modes(
                               background: bhcyelow,
@@ -159,12 +209,12 @@ class MyHomePage extends StatelessWidget {
                               mgLeft: 30,
                               mgRight: 10,
                               mgBottom: 30,
-                              modeName: "Documents",
+                              modeName: "TPS Statement",
                               assetImage: "assets/images/doc.png",
                               buttonAsset: "assets/images/nav.png",
-                               onTap: () {
-                                Navigator.pushNamed(context, '/maintenanceRequest');
-                              }, 
+                              onTap: () {
+                                
+                              },
                             ),
                           ],
                         ),
@@ -185,7 +235,7 @@ class MyHomePage extends StatelessWidget {
                               buttonAsset: "assets/images/nav.png",
                               onTap: () {
                                 Navigator.pushNamed(context, '/maintenanceRequest');
-                              }, 
+                              },
                             ),
                             Modes(
                               background: bhcyelow,
@@ -197,9 +247,9 @@ class MyHomePage extends StatelessWidget {
                               modeName: "Group Chat",
                               assetImage: "assets/images/chat.png",
                               buttonAsset: "assets/images/nav.png",
-                               onTap: () {
-                                Navigator.pushNamed(context, '/maintenanceRequest');
-                              }, 
+                              onTap: () {
+                                // Handle Group Chat navigation
+                              },
                             ),
                           ],
                         ),
